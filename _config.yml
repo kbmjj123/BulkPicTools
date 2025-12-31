@@ -1,0 +1,6 @@
+# 这是一个 Jekyll 配置文件，GitHub Pages 会自动读取它
+theme: jekyll-theme-cayman  # 推荐 'cayman' 或 'minimal' 或 'slate'
+title: BulkPicTools
+description: Privacy-first batch image editor. Crop, compress, and convert images locally.
+show_downloads: false
+google_analytics:           # 如果您想统计这个页面的流量
