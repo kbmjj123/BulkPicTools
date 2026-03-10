@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BulkPicTools – Free Batch Image Processing, 100% Private</title>
+  <meta name="description" content="Free online batch image tools. Bulk crop, compress, convert, resize, rotate, watermark, GIF & EXIF tools. 100% client-side, WebAssembly-powered, no uploads ever." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --surface2: #1a1a24;
+      --border: rgba(255,255,255,0.07);
+      --text: #e8e8f0;
+      --muted: #7070a0;
+      --accent: #6c63ff;
+      --accent2: #ff6b6b;
+      --accent3: #43e97b;
+      --glow: rgba(108,99,255,0.3);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE TEXTURE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2.5rem;
+      background: rgba(10,10,15,0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-logo span {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: var(--accent);
+      color: #fff !important;
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      transition: opacity 0.2s !important;
+    }
+
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 5rem;
+      overflow: hidden;
+    }
+
+    .hero-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+    }
+
+    .hero-orb-1 {
+      width: 600px; height: 600px;
+      top: -150px; left: 50%;
+      transform: translateX(-50%);
+      background: radial-gradient(circle, rgba(108,99,255,0.18) 0%, transparent 70%);
+    }
+
+    .hero-orb-2 {
+      width: 400px; height: 400px;
+      bottom: 0; right: -100px;
+      background: radial-gradient(circle, rgba(67,233,123,0.1) 0%, transparent 70%);
+    }
+
+    .hero-orb-3 {
+      width: 300px; height: 300px;
+      bottom: 100px; left: -80px;
+      background: radial-gradient(circle, rgba(255,107,107,0.1) 0%, transparent 70%);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(108,99,255,0.12);
+      border: 1px solid rgba(108,99,255,0.3);
+      color: #a09aff;
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 0.3rem 0.85rem;
+      border-radius: 100px;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.02em;
+    }
+
+    .badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent3);
+      box-shadow: 0 0 6px var(--accent3);
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.6rem, 7vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      max-width: 900px;
+      margin-bottom: 1.2rem;
+    }
+
+    h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent) 0%, #a78bfa 50%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--muted);
+      max-width: 560px;
+      margin-bottom: 2.5rem;
+      font-weight: 300;
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 4rem;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent);
+      color: #fff;
+      padding: 0.85rem 2rem;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 30px rgba(108,99,255,0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 45px rgba(108,99,255,0.6);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: transparent;
+      color: var(--text);
+      padding: 0.85rem 2rem;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      border: 1px solid var(--border);
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface);
+      border-color: rgba(255,255,255,0.15);
+    }
+
+    /* ── STATS ── */
+    .stats-row {
+      display: flex;
+      gap: 3rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .stat-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .stat-divider {
+      width: 1px;
+      height: 40px;
+      background: var(--border);
+    }
+
+    /* ── SECTIONS ── */
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 5rem 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-sub {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 520px;
+      margin-bottom: 3rem;
+      font-weight: 300;
+    }
+
+    /* ── COMPARISON TABLE ── */
+    .comparison-wrap {
+      overflow-x: auto;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    thead th {
+      padding: 1rem 1.5rem;
+      text-align: left;
+      background: var(--surface);
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+
+    thead th:last-child {
+      color: var(--accent);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+    tbody td {
+      padding: 1rem 1.5rem;
+      color: var(--muted);
+    }
+
+    tbody td:first-child {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    tbody td:last-child {
+      color: var(--text);
+    }
+
+    .check { color: var(--accent3); font-size: 1rem; }
+    .cross { color: var(--accent2); font-size: 1rem; }
+
+    /* ── TOOL GRID ── */
+    .tools-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .tools-header .right a {
+      color: var(--accent);
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .tool-categories {
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+
+    .category-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .category-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .tool-card {
+      display: flex;
+      flex-direction: column;
+      padding: 1.25rem 1.4rem;
+      background: var(--surface);
+      text-decoration: none;
+      transition: background 0.2s;
+      gap: 0.35rem;
+    }
+
+    .tool-card:hover {
+      background: var(--surface2);
+    }
+
+    .tool-icon {
+      font-size: 1.3rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .tool-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .tool-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .step-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .step-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+    }
+
+    .step-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 3rem;
+      font-weight: 800;
+      color: rgba(108,99,255,0.15);
+      line-height: 1;
+      margin-bottom: 0.75rem;
+    }
+
+    .step-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .step-body {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── BLOG ── */
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .blog-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .blog-card:hover {
+      border-color: rgba(108,99,255,0.4);
+      transform: translateY(-3px);
+    }
+
+    .blog-date {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    .blog-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.4;
+    }
+
+    .blog-arrow {
+      margin-top: auto;
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    /* ── CTA BANNER ── */
+    .cta-banner {
+      background: linear-gradient(135deg, rgba(108,99,255,0.12) 0%, rgba(67,233,123,0.06) 100%);
+      border: 1px solid rgba(108,99,255,0.2);
+      border-radius: 24px;
+      padding: 4rem 3rem;
+      text-align: center;
+    }
+
+    .cta-banner h2 {
+      margin-bottom: 1rem;
+    }
+
+    .cta-banner p {
+      color: var(--muted);
+      margin-bottom: 2rem;
+      font-weight: 300;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: gap;
+      gap: 1rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      position: relative;
+      z-index: 1;
+    }
+
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* ── SHIELDS ── */
+    .shields {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .shields img { height: 20px; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-up {
+      animation: fadeUp 0.7s ease both;
+    }
+
+    .fade-up-2 { animation-delay: 0.1s; }
+    .fade-up-3 { animation-delay: 0.2s; }
+    .fade-up-4 { animation-delay: 0.3s; }
+    .fade-up-5 { animation-delay: 0.4s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      nav { padding: 1rem 1.25rem; }
+      .nav-links { display: none; }
+      section { padding: 3.5rem 1.25rem; }
+      .stats-row { gap: 1.5rem; }
+      .stat-divider { display: none; }
+      .cta-banner { padding: 2.5rem 1.5rem; }
+      footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="https://bulkpictools.com" class="nav-logo">
+    <span></span>BulkPicTools
+  </a>
+  <ul class="nav-links">
+    <li><a href="#tools">Tools</a></li>
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#blog">Blog</a></li>
+    <li><a href="https://github.com/kbmjj123/BulkPicTools">GitHub</a></li>
+    <li><a href="https://bulkpictools.com" class="nav-cta">Open App →</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+  <div class="hero-orb hero-orb-3"></div>
+
+  <div class="badge fade-up">Open Source · WebAssembly · Privacy First</div>
+
+  <h1 class="fade-up fade-up-2">
+    Batch Image Tools.<br/><em>Zero Uploads. Ever.</em>
+  </h1>
+
+  <p class="hero-sub fade-up fade-up-3">
+    30+ tools to crop, compress, convert, resize and more — powered by WebAssembly, running entirely in your browser. Your photos never touch a server.
+  </p>
+
+  <div class="shields fade-up fade-up-3">
+    <img src="https://img.shields.io/website?url=https%3A%2F%2Fbulkpictools.com" alt="Website" />
+    <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License" />
+    <img src="https://img.shields.io/badge/Privacy-First-blue.svg" alt="Privacy" />
+    <img src="https://img.shields.io/badge/Tools-30%2B-orange.svg" alt="Tools" />
+    <img src="https://img.shields.io/badge/Happy%20Users-50K%2B-brightgreen.svg" alt="Users" />
+  </div>
+
+  <div class="hero-actions fade-up fade-up-4">
+    <a href="https://bulkpictools.com" class="btn-primary">
+      🚀 Start Processing Free
+    </a>
+    <a href="https://github.com/kbmjj123/BulkPicTools" class="btn-secondary">
+      ★ Star on GitHub
+    </a>
+  </div>
+
+  <div class="stats-row fade-up fade-up-5">
+    <div class="stat">
+      <div class="stat-num">1M+</div>
+      <div class="stat-label">Images Processed</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-num">50K+</div>
+      <div class="stat-label">Happy Users</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-num">0</div>
+      <div class="stat-label">Server Uploads</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-num">30+</div>
+      <div class="stat-label">Free Tools</div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPARISON -->
+<section id="why">
+  <div class="section-label">Why BulkPicTools</div>
+  <h2>Stop uploading your private photos to random servers.</h2>
+  <p class="section-sub">Everything runs locally. Instant results, no limits, no privacy risk.</p>
+  <div class="comparison-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Traditional Tools</th>
+          <th>BulkPicTools</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Speed</td>
+          <td>Slow (Upload + Wait)</td>
+          <td><span class="check">⚡</span> Instant (Real-time)</td>
+        </tr>
+        <tr>
+          <td>Privacy</td>
+          <td><span class="cross">✗</span> Uploaded to Server</td>
+          <td><span class="check">🔒</span> 100% Local & Private</td>
+        </tr>
+        <tr>
+          <td>Batch Limit</td>
+          <td>10–20 files</td>
+          <td><span class="check">♾</span> Unlimited (1000+)</td>
+        </tr>
+        <tr>
+          <td>File Size Limit</td>
+          <td>5–10 MB</td>
+          <td><span class="check">✓</span> No Limits</td>
+        </tr>
+        <tr>
+          <td>Offline Support</td>
+          <td><span class="cross">✗</span> Requires Internet</td>
+          <td><span class="check">✓</span> Works Offline</td>
+        </tr>
+        <tr>
+          <td>Price</td>
+          <td>Paid / Freemium</td>
+          <td><span class="check">🆓</span> Free Forever</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- TOOLS -->
+<section id="tools">
+  <div class="tools-header">
+    <div>
+      <div class="section-label">All Tools</div>
+      <h2>30+ tools, 8 categories.</h2>
+    </div>
+    <div class="right">
+      <a href="https://bulkpictools.com/tools">Browse all →</a>
+    </div>
+  </div>
+
+  <div class="tool-categories">
+
+    <div>
+      <div class="category-title">🔄 Format Converters</div>
+      <div class="tool-grid">
+        <a href="https://bulkpictools.com/tools/convert/image-converter" class="tool-card">
+          <div class="tool-icon">🔄</div>
+          <div class="tool-name">Bulk Image Converter</div>
+          <div class="tool-desc">JPG, PNG, WebP, AVIF, HEIC in batch</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/convert/heic-to-jpg" class="tool-card">
+          <div class="tool-icon">📱</div>
+          <div class="tool-name">HEIC to JPG</div>
+          <div class="tool-desc">Convert iPhone photos locally</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/convert/to-jpg" class="tool-card">
+          <div class="tool-icon">🖼️</div>
+          <div class="tool-name">Image to JPG</div>
+          <div class="tool-desc">Batch convert any format to JPG</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/convert/to-png" class="tool-card">
+          <div class="tool-icon">🖼️</div>
+          <div class="tool-name">Image to PNG</div>
+          <div class="tool-desc">Batch convert any format to PNG</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/convert/to-webp" class="tool-card">
+          <div class="tool-icon">⚡</div>
+          <div class="tool-name">Image to WebP</div>
+          <div class="tool-desc">Batch convert any format to WebP</div>
+        </a>
+      </div>
+    </div>
+
+    <div>
+      <div class="category-title">📦 Image Compression</div>
+      <div class="tool-grid">
+        <a href="https://bulkpictools.com/tools/compress/image-compressor" class="tool-card">
+          <div class="tool-icon">📦</div>
+          <div class="tool-name">Bulk Compressor</div>
+          <div class="tool-desc">Intelligently reduce image size</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/compress/compress-to-50kb" class="tool-card">
+          <div class="tool-icon">🎯</div>
+          <div class="tool-name">Compress to 50KB</div>
+          <div class="tool-desc">Precise target-size compression</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/compress/compress-to-100kb" class="tool-card">
+          <div class="tool-icon">🎯</div>
+          <div class="tool-name">Compress to 100KB</div>
+          <div class="tool-desc">Precise target-size compression</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/compress/compress-to-200kb" class="tool-card">
+          <div class="tool-icon">🎯</div>
+          <div class="tool-name">Compress to 200KB</div>
+          <div class="tool-desc">Precise target-size compression</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/compress/compress-to-500kb" class="tool-card">
+          <div class="tool-icon">🎯</div>
+          <div class="tool-name">Compress to 500KB</div>
+          <div class="tool-desc">Precise target-size compression</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/compress/compress-to-1mb" class="tool-card">
+          <div class="tool-icon">🎯</div>
+          <div class="tool-name">Compress to 1MB</div>
+          <div class="tool-desc">Precise target-size compression</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/compress/compress-to-2mb" class="tool-card">
+          <div class="tool-icon">🎯</div>
+          <div class="tool-name">Compress to 2MB</div>
+          <div class="tool-desc">Precise target-size compression</div>
+        </a>
+      </div>
+    </div>
+
+    <div>
+      <div class="category-title">✂️ Crop · 📐 Resize · 🔁 Rotate & Flip</div>
+      <div class="tool-grid">
+        <a href="https://bulkpictools.com/tools/crop/image-cropper" class="tool-card">
+          <div class="tool-icon">✂️</div>
+          <div class="tool-name">Bulk Image Cropper</div>
+          <div class="tool-desc">Fixed ratios, unlimited files</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/crop/passport-photo-cropper" class="tool-card">
+          <div class="tool-icon">🪪</div>
+          <div class="tool-name">Passport Photo Cropper</div>
+          <div class="tool-desc">Standard passport dimensions</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/crop/2x2-photo-cropper" class="tool-card">
+          <div class="tool-icon">📷</div>
+          <div class="tool-name">2x2 Photo Cropper</div>
+          <div class="tool-desc">2×2 inch standard size</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/crop/circle-image-cropper" class="tool-card">
+          <div class="tool-icon">⭕</div>
+          <div class="tool-name">Circle Image Cropper</div>
+          <div class="tool-desc">Crop into perfect circles</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/resize/image-resizer" class="tool-card">
+          <div class="tool-icon">📐</div>
+          <div class="tool-name">Bulk Image Resizer</div>
+          <div class="tool-desc">Pixels or percentage, batch</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/resize/instagram-resizer" class="tool-card">
+          <div class="tool-icon">📸</div>
+          <div class="tool-name">Instagram Resizer</div>
+          <div class="tool-desc">All Instagram post sizes</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/resize/facebook-image-resizer" class="tool-card">
+          <div class="tool-icon">👍</div>
+          <div class="tool-name">Facebook Resizer</div>
+          <div class="tool-desc">Facebook recommended sizes</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/resize/youtube-thumbnail-resizer" class="tool-card">
+          <div class="tool-icon">▶️</div>
+          <div class="tool-name">YouTube Thumbnail</div>
+          <div class="tool-desc">1280×720 thumbnail spec</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/rotate/image-rotator" class="tool-card">
+          <div class="tool-icon">🔄</div>
+          <div class="tool-name">Bulk Rotator</div>
+          <div class="tool-desc">90° / 180° / 270° batch rotate</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/rotate/image-flipper" class="tool-card">
+          <div class="tool-icon">↔️</div>
+          <div class="tool-name">Bulk Flipper</div>
+          <div class="tool-desc">Horizontal or vertical flip</div>
+        </a>
+      </div>
+    </div>
+
+    <div>
+      <div class="category-title">🎞️ GIF · 💧 Watermark · 🔍 EXIF</div>
+      <div class="tool-grid">
+        <a href="https://bulkpictools.com/tools/gif/gif-maker" class="tool-card">
+          <div class="tool-icon">🎞️</div>
+          <div class="tool-name">Online GIF Maker</div>
+          <div class="tool-desc">Create animated GIFs easily</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/gif/gif-compressor" class="tool-card">
+          <div class="tool-icon">🗜️</div>
+          <div class="tool-name">GIF Compressor</div>
+          <div class="tool-desc">Reduce GIF size without quality loss</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/gif/images-to-gif" class="tool-card">
+          <div class="tool-icon">🖼️</div>
+          <div class="tool-name">Images to GIF</div>
+          <div class="tool-desc">Turn image series into animated GIF</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/gif/video-to-gif" class="tool-card">
+          <div class="tool-icon">🎬</div>
+          <div class="tool-name">Video to GIF</div>
+          <div class="tool-desc">Convert video clips to GIF locally</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/watermark/image-watermark" class="tool-card">
+          <div class="tool-icon">💧</div>
+          <div class="tool-name">Batch Watermark</div>
+          <div class="tool-desc">Text or image watermarks in bulk</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/exif/exif-viewer" class="tool-card">
+          <div class="tool-icon">🔍</div>
+          <div class="tool-name">EXIF Viewer</div>
+          <div class="tool-desc">View all photo metadata</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/exif/exif-editor" class="tool-card">
+          <div class="tool-icon">✏️</div>
+          <div class="tool-name">EXIF Editor</div>
+          <div class="tool-desc">Edit or strip EXIF to protect privacy</div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-label">How It Works</div>
+  <h2>Three steps. No server involved.</h2>
+  <p class="section-sub">Your browser does all the heavy lifting via WebAssembly.</p>
+  <div class="steps">
+    <div class="step-card">
+      <div class="step-num">01</div>
+      <div class="step-title">Select Files</div>
+      <p class="step-body">Drag & drop your images. Supports JPG, PNG, WebP, HEIC, AVIF, GIF and more. No upload wait time.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num">02</div>
+      <div class="step-title">Process Locally</div>
+      <p class="step-body">Our WebAssembly engine runs entirely in your browser. Data never leaves your device — ever.</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num">03</div>
+      <div class="step-title">Instant Save</div>
+      <p class="step-body">Download all processed files immediately, in a ZIP or individually. No server limits, no watermarks.</p>
+    </div>
+  </div>
+</section>
+
+<!-- BLOG -->
+<section id="blog">
+  <div class="section-label">Blog</div>
+  <h2>Tips & tutorials.</h2>
+  <p class="section-sub">Guides on image processing, performance and privacy.</p>
+  <div class="blog-grid">
+    <a href="https://bulkpictools.com/blog/zero-server-image-editing-indexeddb-wasm" class="blog-card">
+      <div class="blog-date">Feb 26, 2026</div>
+      <div class="blog-title">Zero-Server Image Editing: The Future of Bulk Image Processing Speed and Privacy</div>
+      <div class="blog-arrow">Read article →</div>
+    </a>
+    <a href="https://bulkpictools.com/blog/image-converter-webp-avif-performance-guide" class="blog-card">
+      <div class="blog-date">Feb 25, 2026</div>
+      <div class="blog-title">2026 Image Conversion Guide: Why Your Website Still Loads Like a Turtle</div>
+      <div class="blog-arrow">Read article →</div>
+    </a>
+    <a href="https://bulkpictools.com/blog/exif-privacy-guide-2026" class="blog-card">
+      <div class="blog-date">Feb 24, 2026</div>
+      <div class="blog-title">Why I Always Strip EXIF Data Before Posting Photos Online</div>
+      <div class="blog-arrow">Read article →</div>
+    </a>
+    <a href="https://bulkpictools.com/blog/batch-resize-images-without-quality-loss" class="blog-card">
+      <div class="blog-date">Feb 11, 2026</div>
+      <div class="blog-title">2026 Image Resizer Guide: How to Batch Resize Without Quality Loss</div>
+      <div class="blog-arrow">Read article →</div>
+    </a>
+  </div>
+</section>
+
+<!-- CTA -->
+<section>
+  <div class="cta-banner">
+    <div class="section-label" style="justify-content:center;display:flex">Get Started</div>
+    <h2>Ready to take control of your images?</h2>
+    <p>Join 50,000+ users processing images locally and securely. Free forever, no login required.</p>
+    <div class="hero-actions" style="justify-content:center">
+      <a href="https://bulkpictools.com" class="btn-primary">🚀 Open BulkPicTools</a>
+      <a href="https://github.com/kbmjj123/BulkPicTools" class="btn-secondary">★ Star on GitHub</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2026 BulkPicTools · MIT License</span>
+  <div class="footer-links">
+    <a href="https://bulkpictools.com">Website</a>
+    <a href="https://bulkpictools.com/tools">All Tools</a>
+    <a href="https://bulkpictools.com/blog">Blog</a>
+    <a href="https://github.com/kbmjj123/BulkPicTools">GitHub</a>
+    <a href="https://bulkpictools.com/privacy">Privacy</a>
+    <a href="https://bulkpictools.com/zh">中文</a>
+  </div>
+</footer>
+
+</body>
+</html>
