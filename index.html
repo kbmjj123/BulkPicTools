@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BulkPicTools – Free Batch Image Processing, 100% Private</title>
-  <meta name="description" content="Free online batch image tools. Bulk crop, compress, convert, resize, rotate, watermark, GIF & EXIF tools. 100% client-side, WebAssembly-powered, no uploads ever." />
+  <title>BulkPicTools – 100+ Free Batch Image Tools, 100% Private</title>
+  <meta name="description" content="100+ free batch image tools across 11 categories: convert, compress, crop, resize, GIF, EXIF, effects and local AI. Runs entirely in your browser with WebAssembly — no uploads, available in 11 languages." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
@@ -271,6 +271,77 @@
       width: 1px;
       height: 40px;
       background: var(--border);
+    }
+
+    /* ── PRODUCT SHOTS & FEATURES ── */
+    .hero-shot {
+      position: relative;
+      z-index: 1;
+      display: block;
+      width: 100%;
+      max-width: 960px;
+      margin-top: 3.5rem;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.45);
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 3rem;
+    }
+
+    .feature-card {
+      padding: 1.6rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .feature-card h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.05rem;
+      color: var(--text);
+      margin-bottom: 0.6rem;
+    }
+
+    .feature-card p {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.6;
+      font-weight: 300;
+      margin-bottom: 1rem;
+    }
+
+    .feature-card a {
+      color: var(--accent);
+      font-size: 0.85rem;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .showcase {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .showcase figure { margin: 0; }
+
+    .showcase img {
+      display: block;
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .showcase figcaption {
+      margin-top: 0.75rem;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 300;
     }
 
     /* ── SECTIONS ── */
@@ -628,6 +699,7 @@
   <ul class="nav-links">
     <li><a href="#tools">Tools</a></li>
     <li><a href="#how">How it works</a></li>
+    <li><a href="#more">Scenes & AI</a></li>
     <li><a href="#blog">Blog</a></li>
     <li><a href="https://github.com/kbmjj123/BulkPicTools">GitHub</a></li>
     <li><a href="https://bulkpictools.com" class="nav-cta">Open App →</a></li>
@@ -640,22 +712,22 @@
   <div class="hero-orb hero-orb-2"></div>
   <div class="hero-orb hero-orb-3"></div>
 
-  <div class="badge fade-up">Open Source · WebAssembly · Privacy First</div>
+  <div class="badge fade-up">100% Local · WebAssembly · Privacy First</div>
 
   <h1 class="fade-up fade-up-2">
     Batch Image Tools.<br/><em>Zero Uploads. Ever.</em>
   </h1>
 
   <p class="hero-sub fade-up fade-up-3">
-    30+ tools to crop, compress, convert, resize and more — powered by WebAssembly, running entirely in your browser. Your photos never touch a server.
+    100+ tools across 11 categories — convert, compress, crop, resize, GIF, EXIF, effects and local AI. Powered by WebAssembly, running entirely in your browser. Your photos never touch a server.
   </p>
 
   <div class="shields fade-up fade-up-3">
     <img src="https://img.shields.io/website?url=https%3A%2F%2Fbulkpictools.com" alt="Website" />
     <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License" />
     <img src="https://img.shields.io/badge/Privacy-First-blue.svg" alt="Privacy" />
-    <img src="https://img.shields.io/badge/Tools-30%2B-orange.svg" alt="Tools" />
-    <img src="https://img.shields.io/badge/Happy%20Users-50K%2B-brightgreen.svg" alt="Users" />
+    <img src="https://img.shields.io/badge/Tools-100%2B-orange.svg" alt="100+ tools" />
+    <img src="https://img.shields.io/badge/Languages-11-purple.svg" alt="11 languages" />
   </div>
 
   <div class="hero-actions fade-up fade-up-4">
@@ -684,10 +756,12 @@
     </div>
     <div class="stat-divider"></div>
     <div class="stat">
-      <div class="stat-num">30+</div>
+      <div class="stat-num">100+</div>
       <div class="stat-label">Free Tools</div>
     </div>
   </div>
+
+  <img class="hero-shot fade-up fade-up-5" src="assets/home.webp" alt="BulkPicTools home screen: drop images, folders or ZIP archives and process them locally without uploading" />
 </div>
 
 <!-- COMPARISON -->
@@ -745,7 +819,7 @@
   <div class="tools-header">
     <div>
       <div class="section-label">All Tools</div>
-      <h2>30+ tools, 8 categories.</h2>
+      <h2>100+ tools, 11 categories.</h2>
     </div>
     <div class="right">
       <a href="https://bulkpictools.com/tools">Browse all →</a>
@@ -923,6 +997,42 @@
       </div>
     </div>
 
+    <div>
+      <div class="category-title">🎨 Adjust · ✏️ Edit Effects · 🤖 Local AI</div>
+      <div class="tool-grid">
+        <a href="https://bulkpictools.com/tools/adjust/change-image-brightness" class="tool-card">
+          <div class="tool-icon">☀️</div>
+          <div class="tool-name">Change Brightness</div>
+          <div class="tool-desc">Batch brightness adjustment</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/edit/merge-images" class="tool-card">
+          <div class="tool-icon">🧩</div>
+          <div class="tool-name">Merge Images</div>
+          <div class="tool-desc">Combine into grids and side-by-side layouts</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/edit/split-image" class="tool-card">
+          <div class="tool-icon">🔲</div>
+          <div class="tool-name">Split Image</div>
+          <div class="tool-desc">Grid tiles, including Instagram 3×3</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/ai/remove-background" class="tool-card">
+          <div class="tool-icon">🪄</div>
+          <div class="tool-name">Remove Background</div>
+          <div class="tool-desc">AI cutout that runs on your device</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/ai/image-upscaler" class="tool-card">
+          <div class="tool-icon">🔎</div>
+          <div class="tool-name">AI Upscaler</div>
+          <div class="tool-desc">2× / 4× super-resolution in the browser</div>
+        </a>
+        <a href="https://bulkpictools.com/tools/ai/remove-object" class="tool-card">
+          <div class="tool-icon">🧽</div>
+          <div class="tool-name">Remove Object</div>
+          <div class="tool-desc">Paint over objects and let AI fill them in</div>
+        </a>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -947,6 +1057,41 @@
       <div class="step-title">Instant Save</div>
       <p class="step-body">Download all processed files immediately, in a ZIP or individually. No server limits, no watermarks.</p>
     </div>
+  </div>
+</section>
+
+<!-- SCENES, AI & LANGUAGES -->
+<section id="more">
+  <div class="section-label">Beyond the tools</div>
+  <h2>Workflows, AI, and 11 languages.</h2>
+  <p class="section-sub">Still 100% local. Still zero uploads.</p>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h3>🧩 10 scene workflows</h3>
+      <p>Prebuilt multi-step flows — app icon packages, contact sheets, before/after comparisons and more — so you don't have to jump between tool pages.</p>
+      <a href="https://bulkpictools.com/scenes">Explore scenes →</a>
+    </div>
+    <div class="feature-card">
+      <h3>🤖 Local AI, no inference server</h3>
+      <p>Remove backgrounds, upscale 2×/4×, erase objects and blur faces with ONNX Runtime Web and WebGPU. Models are cached after the first download.</p>
+      <a href="https://bulkpictools.com/tools/ai">Try AI tools →</a>
+    </div>
+    <div class="feature-card">
+      <h3>🌐 11 languages</h3>
+      <p>Interface and tool pages in English, 简体中文, 繁體中文, 日本語, Español, Français, Deutsch, हिन्दी, Bahasa Indonesia and Português.</p>
+      <a href="https://bulkpictools.com/zh">切换到中文 →</a>
+    </div>
+  </div>
+
+  <div class="showcase">
+    <figure>
+      <img src="assets/all-tools.webp" alt="The BulkPicTools catalog organized by category" loading="lazy" />
+      <figcaption>Browse 100+ tools by category.</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/results.webp" alt="Batch compression results with downloads and suggested next tools" loading="lazy" />
+      <figcaption>Download a ZIP, or chain straight into the next tool — no re-upload.</figcaption>
+    </figure>
   </div>
 </section>
 
@@ -998,10 +1143,12 @@
   <div class="footer-links">
     <a href="https://bulkpictools.com">Website</a>
     <a href="https://bulkpictools.com/tools">All Tools</a>
+    <a href="https://bulkpictools.com/scenes">Scenes</a>
     <a href="https://bulkpictools.com/blog">Blog</a>
     <a href="https://github.com/kbmjj123/BulkPicTools">GitHub</a>
     <a href="https://bulkpictools.com/privacy">Privacy</a>
-    <a href="https://bulkpictools.com/zh">中文</a>
+    <a href="https://github.com/kbmjj123/BulkPicTools/blob/main/README.zh-CN.md">Docs 中文</a>
+    <a href="https://bulkpictools.com/zh">中文站</a>
   </div>
 </footer>
 
